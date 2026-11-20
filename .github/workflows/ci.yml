@@ -1,0 +1,36 @@
+name: detection-ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-and-convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install pinned dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint YAML
+        run: yamllint rules/
+
+      - name: Validate Sigma rules
+        run: sigma check rules/
+
+      - name: Convert to Splunk SPL / SPL2
+        run: |
+          mkdir -p build
+          sigma convert -t splunk      -p splunk_windows rules/ -o build/splunk.spl
+          sigma convert -t splunk_spl2 -p splunk_windows rules/ -o build/splunk.spl2
+
+      - name: Upload converted queries
+        uses: actions/upload-artifact@v4
+        with:
+          name: siem-queries
+          path: build/

@@ -1,0 +1,40 @@
+title: PowerShell Execution With Encoded Command
+id: 3a2a0d41-fa4e-4f65-b94a-4f6320dc5c69
+status: experimental
+description: |
+  Detects powershell.exe / pwsh.exe launched with the -EncodedCommand parameter
+  (or one of its abbreviations). Loaders, C2 stagers and malicious macros often
+  use it to hide script content from command-line inspection.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://attack.mitre.org/techniques/T1027/
+author: Ian Cavero
+date: 2026-11-20
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.stealth
+  - attack.t1027
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    - Image|endswith:
+        - '\powershell.exe'
+        - '\pwsh.exe'
+    - OriginalFileName:
+        - 'PowerShell.EXE'
+        - 'pwsh.dll'
+  selection_cli:
+    CommandLine|windash|contains:
+      - ' -e '
+      - ' -ec '
+      - ' -en '
+      - ' -enc '
+      - ' -enco'
+      - ' -encodedcommand '
+  condition: all of selection_*
+falsepositives:
+  - Management tooling that legitimately uses encoded commands (SCCM, Intune, some RMM agents)
+level: medium

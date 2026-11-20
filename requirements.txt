@@ -1,0 +1,5 @@
+pySigma==2.1.0
+pysigma-backend-splunk==3.0.1
+PyYAML==6.0.3
+sigma-cli==4.0.1
+yamllint==1.38.0
