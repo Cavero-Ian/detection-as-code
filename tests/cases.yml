@@ -1,0 +1,9 @@
+# True-positive test cases: each rule must detect its labeled attack sample.
+# expected_min: minimum detections required (a FAIL means the rule missed the attack)
+# expected_max: optional upper bound (use 0 for benign / negative samples)
+cases:
+  - id: t1059-001-encoded-powershell
+    rule: rules/windows/process_creation/proc_creation_win_powershell_encoded_cmd.yml
+    sample: tests/samples/T1059.001/sysmon_1_powershell_encoded.evtx
+    expected_min: 3
+    notes: Self-generated Sysmon EID 1; variants -EncodedCommand, -enc, /e

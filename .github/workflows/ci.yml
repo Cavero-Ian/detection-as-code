@@ -18,7 +18,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Lint YAML
-        run: yamllint rules/
+        run: yamllint rules/ tests/cases.yml
 
       - name: Validate Sigma rules
         run: sigma check rules/
@@ -28,6 +28,37 @@ jobs:
           mkdir -p build
           sigma convert -t splunk      -p splunk_windows rules/ -o build/splunk.spl
           sigma convert -t splunk_spl2 -p splunk_windows rules/ -o build/splunk.spl2
+
+      - name: Install Chainsaw (pinned)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHAINSAW_VERSION: v2.18.0
+        run: |
+          mkdir -p /tmp/chainsaw && cd /tmp/chainsaw
+          echo "Release assets:"
+          gh release view "$CHAINSAW_VERSION" --repo WithSecureLabs/chainsaw --json assets -q '.assets[].name'
+          gh release download "$CHAINSAW_VERSION" --repo WithSecureLabs/chainsaw --pattern '*x86_64-unknown-linux-gnu*'
+          for f in *; do
+            case "$f" in
+              *.tar.gz) tar -xzf "$f" ;;
+              *.zip)    unzip -q "$f" ;;
+            esac
+          done
+          BIN=$(find . -type f -name chainsaw | head -n1)
+          chmod +x "$BIN"
+          MAP=$(find . -type f -name sigma-event-logs-all.yml | head -n1)
+          if [ -z "$MAP" ]; then
+            gh api -H "Accept: application/vnd.github.raw" \
+              "repos/WithSecureLabs/chainsaw/contents/mappings/sigma-event-logs-all.yml?ref=$CHAINSAW_VERSION" \
+              > sigma-event-logs-all.yml
+            MAP=sigma-event-logs-all.yml
+          fi
+          echo "CHAINSAW=$(realpath "$BIN")" >> "$GITHUB_ENV"
+          echo "CHAINSAW_MAPPING=$(realpath "$MAP")" >> "$GITHUB_ENV"
+          "$BIN" --version
+
+      - name: True-positive tests
+        run: python scripts/run_tests.py
 
       - name: Upload converted queries
         uses: actions/upload-artifact@v4
