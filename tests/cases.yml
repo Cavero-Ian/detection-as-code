@@ -7,3 +7,9 @@ cases:
     sample: tests/samples/T1059.001/sysmon_1_powershell_encoded.evtx
     expected_min: 3
     notes: Self-generated Sysmon EID 1; variants -EncodedCommand, -enc, /e
+  - id: t1059-001-encoded-powershell-benign
+    rule: rules/windows/process_creation/proc_creation_win_powershell_encoded_cmd.yml
+    sample: tests/samples/benign/sysmon_1_powershell_benign.evtx
+    expected_min: 0
+    expected_max: 0
+    notes: Self-generated benign PowerShell (-NoProfile, -ExecutionPolicy, -NonInteractive); must produce no hits

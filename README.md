@@ -11,13 +11,14 @@ and converted automatically to SIEM queries.
 | Lint | `yamllint` | YAML syntax |
 | Validate | `sigma check` | Rule validity + ATT&CK v19 tag validation |
 | Convert | `sigma convert` | Splunk SPL / SPL2 queries, published as CI artifacts |
+| Test | Chainsaw 2.18.0 | True-positive and negative tests on self-generated Sysmon telemetry (`tests/cases.yml`) |
 
 Every change reaches `main` only through a pull request with passing checks (branch ruleset).
 
 ## Rules
 | Rule | ATT&CK | Level | Status |
 |---|---|---|---|
-| PowerShell Execution With Encoded Command | T1059.001, T1027 | medium | experimental |
+| PowerShell Execution With Encoded Command | T1059.001, T1027 | medium | test |
 
 ## Notable decisions
 - **ATT&CK v19:** Defense Evasion was split into Stealth (TA0005) and Defense Impairment (TA0112); the CI validator rejects outdated tactic tags.
@@ -25,7 +26,7 @@ Every change reaches `main` only through a pull request with passing checks (bra
 - **Splunk only for now:** Elastic and KQL backends are pending pySigma 2.x compatibility.
 
 ## Roadmap
-- [ ] True-positive testing against public attack logs (EVTX)
+- [x] True-positive and negative testing against self-generated Sysmon telemetry (EVTX)
 - [ ] ATT&CK Navigator coverage layer generated in CI
 - [ ] 15+ rules across Execution, Persistence, Credential Access and Stealth
 - [ ] Elastic / KQL conversion once backends support pySigma 2.x
