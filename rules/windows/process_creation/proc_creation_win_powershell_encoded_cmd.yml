@@ -1,6 +1,6 @@
 title: PowerShell Execution With Encoded Command
 id: 3a2a0d41-fa4e-4f65-b94a-4f6320dc5c69
-status: experimental
+status: test
 description: |
   Detects powershell.exe / pwsh.exe launched with the -EncodedCommand parameter
   (or one of its abbreviations). Loaders, C2 stagers and malicious macros often
